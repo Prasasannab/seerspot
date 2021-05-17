@@ -14,7 +14,7 @@ namespace SeerSpot3.Controllers
 
         string StorageName = "seerspot";
         string StorageKey = "PYQSJwzgabBe3TWGhC0/Im2DQkzzGXSahrrd/5TQxxMnl9BizZkzI4jhkvB7aUxQ8LljwoDA28grbb644ugSPA==";
-        string TableName = "CurrentValue";
+        string TableName = "BTC";
 
         static List<Object> updatedArray = new List<Object>();
 
@@ -41,7 +41,8 @@ namespace SeerSpot3.Controllers
             DateTime endtime = DateTime.Now;
 
 
-            DateTime starttime = data[0].Timestamp;
+            DateTime starttime = data.Count > 0 ? data[0].Timestamp : DateTime.Now;
+
 
             for (int i = 0; i < data.Count;)
             {
@@ -64,19 +65,25 @@ namespace SeerSpot3.Controllers
 
                 List<Object> array = new List<Object>();
 
-                array.Add(ReduceMins(starttime) + " " + endtime);//time
+                if(filteredArray.Count > 0)
+                {
+                    array.Add(ReduceMins(starttime) + " " + endtime);//time
 
-                array.Add(filteredArray[0].StockCurrentValue);//open
-                array.Add(filteredArray[filteredArray.Count - 1].StockCurrentValue);//close
-                                                                                    //[time,min, open, close, max]
+                    array.Add(filteredArray[0].StockCurrentValue);//open
+                    array.Add(filteredArray[filteredArray.Count - 1].StockCurrentValue);//close
+                                                                                        //[time,min, open, close, max]
 
-                filteredArray.Sort(new Sorter());
-                array.Insert(1, filteredArray[filteredArray.Count - 1].StockCurrentValue);//min
-                array.Add(filteredArray[0].StockCurrentValue);//max
+                    filteredArray.Sort(new Sorter());
+                    array.Insert(1, filteredArray[filteredArray.Count - 1].StockCurrentValue);//min
+                    array.Add(filteredArray[0].StockCurrentValue);//max
+                    updatedArray.Add(array.ToArray());
+                }
+
+             
 
                 //[[],[],[],[],[]]
 
-                updatedArray.Add(array.ToArray());
+                
                 //}//0, 5
                 if (filteredArray.Count > 0)
                 {
@@ -93,7 +100,7 @@ namespace SeerSpot3.Controllers
         public static DateTime GetUpdatedTime(int future, DateTime date)
         {
 
-            return new DateTime(date.Year, date.Month, date.Day, (date.Hour + future), 0, 0);
+            return new DateTime(date.Year, date.Month, date.Day, (date.Hour == 23 ? 0 : date.Hour+ future), 0, 0);
         }
 
         public static DateTime ReduceMins(DateTime date)
@@ -112,14 +119,11 @@ namespace SeerSpot3.Controllers
                     if (!String.IsNullOrEmpty(stock.Currentvalue))
                     {
                         int index = stock.Currentvalue.IndexOf('$');
-                        if (index != -1)
-                        {
-
-                            Double value = 0.0;
-                            bool isSuccess = Double.TryParse(stock.Currentvalue.Substring((index + 1)), out value);
-
-                            stock.StockCurrentValue = value;
-                        }
+                        Double value = 0.0;
+                        bool isSuccess = Double.TryParse(index == -1 ? stock.Currentvalue : stock.Currentvalue.Substring((index + 1)), out value);
+                        // if (isSuccess)
+                        //  {
+                        stock.StockCurrentValue = value;
                     }
                 }
             }

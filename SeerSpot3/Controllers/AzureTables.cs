@@ -107,18 +107,26 @@ namespace SeerSpot3.Controllers
                     if (!String.IsNullOrEmpty(stock.Currentvalue))
                     {
                         int index = stock.Currentvalue.IndexOf('$');
-                        if (index != -1)
-                        {
-                            // String value = stock.Currentvalue.Substring((index + 1));
+                        //if (index != -1)
+                        //{
+                        //    // String value = stock.Currentvalue.Substring((index + 1));
+                        //    Double value = 0.0;
+                        //    bool isSuccess = Double.TryParse(stock.Currentvalue.Substring((index + 1)), out value);
+                        //    // if (isSuccess)
+                        //    //  {
+                        //    stock.StockCurrentValue = value;
+                        //    //  }
+                        //    // stock.Currentvalue = value;
+
+                        //}
+                        //else
+                        //{
                             Double value = 0.0;
-                            bool isSuccess = Double.TryParse(stock.Currentvalue.Substring((index + 1)), out value);
+                            bool isSuccess = Double.TryParse(index == -1 ? stock.Currentvalue : stock.Currentvalue.Substring((index + 1)), out value);
                             // if (isSuccess)
                             //  {
                             stock.StockCurrentValue = value;
-                            //  }
-                            // stock.Currentvalue = value;
-
-                        }
+                     //   }
                     }
                 }
 
